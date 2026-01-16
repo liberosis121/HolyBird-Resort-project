@@ -114,8 +114,8 @@ namespace HolyBirdResort.DAO
                 try
                 {
                     // TÌNH HUỐNG 15: DEMO TRƯỚC VÀ SAU FIX LỖI
-                    SqlCommand cmd = new SqlCommand("sp_CapNhatThongTinPhong_LOI", conn);
-                    // SqlCommand cmd = new SqlCommand("sp_CapNhatThongTinPhong", conn);
+                    // SqlCommand cmd = new SqlCommand("sp_CapNhatThongTinPhong_LOI", conn);
+                    SqlCommand cmd = new SqlCommand("sp_CapNhatThongTinPhong", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@MaPhong", p.MaPhong);

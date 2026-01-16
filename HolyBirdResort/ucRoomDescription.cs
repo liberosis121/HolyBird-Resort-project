@@ -23,7 +23,7 @@ namespace HolyBirdResort
             // GÁN TRỰC TIẾP (Thay label1, label2 bằng tên thật trên Design của bạn)
             // Ví dụ:
             this.lblTenPhong.Text = $"{p.LoaiHang} - {p.MaPhong}";
-            this.lblGiaPhong.Text = $"{p.GiaPhong:N0} kVND/đêm";
+            this.lblGiaPhong.Text = $"{p.GiaPhong:N0} kVND";
             this.lblThongTinKhac.Text = $"{p.TenHinhThuc} | {p.TrangThai}";
 
             // Logic đổi màu nút
