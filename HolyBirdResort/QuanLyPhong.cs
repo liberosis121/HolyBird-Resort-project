@@ -116,7 +116,15 @@ namespace HolyBirdResort
 
         private void ThemPhong_Them_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtThemSoPhong.Text)) { MessageBox.Show("Nhập số phòng!"); return; }
+            // Kiểm tra thiếu thông tin
+            if (string.IsNullOrWhiteSpace(txtThemSoPhong.Text) ||
+                string.IsNullOrWhiteSpace(txtThemSoTang.Text) ||
+                cboThemPhong_HangPhong.SelectedValue == null ||
+                cboThemPhong_HinhThuc.SelectedValue == null)
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin phòng!", "Nhắc nhở", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             Phong p = new Phong
             {
@@ -197,7 +205,12 @@ namespace HolyBirdResort
 
         private void LuuHangPhong_Click(object sender, EventArgs e) // Nút Sửa Hạng Phòng
         {
-            if (string.IsNullOrEmpty(txtHangPhong_SuaDonGia.Text)) return;
+            // Kiểm tra nếu người dùng xóa nội dung hệ số rồi bỏ trống
+            if (string.IsNullOrWhiteSpace(txtHangPhong_SuaDonGia.Text))
+            {
+                MessageBox.Show("Hệ số giá của hạng phòng không được để trống!", "Nhắc nhở", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             string tenHang = cboHangPhong_SuaHangPhong.Text;
             if (decimal.TryParse(txtHangPhong_SuaDonGia.Text, out decimal heSo))
@@ -232,25 +245,39 @@ namespace HolyBirdResort
         private void LoadCboHinhThucCon()
         {
             DataTable dt = PhongDAO.GetHinhThuc();
+            // Tạm thời gỡ sự kiện hoặc đặt SelectedIndex = -1 sau khi gán để tránh kích hoạt sớm
             cboHinhThucPhong_SuaHinhThuc.DataSource = dt;
             cboHinhThucPhong_SuaHinhThuc.DisplayMember = "TenHinhThuc";
             cboHinhThucPhong_SuaHinhThuc.ValueMember = "TenHinhThuc";
+
+            // Đặt mặc định không chọn gì để người dùng tự chọn, tránh lỗi trigger ngay lập tức
+            cboHinhThucPhong_SuaHinhThuc.SelectedIndex = -1;
+            txtHinhThucPhong_SuaDonGia.Text = "";
         }
 
         private void HinhThucPhong_SuaHinhThuc_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Khi chọn hình thức, lấy hệ số giá
-            if (cboHinhThucPhong_SuaHinhThuc.SelectedValue != null)
+            if (cboHinhThucPhong_SuaHinhThuc.SelectedValue != null &&
+                !(cboHinhThucPhong_SuaHinhThuc.SelectedValue is DataRowView))
             {
                 string tenHT = cboHinhThucPhong_SuaHinhThuc.SelectedValue.ToString();
-                decimal heSo = PhongDAO.GetHeSoHinhThuc(tenHT);
-                txtHinhThucPhong_SuaDonGia.Text = heSo.ToString();
+
+                // Tránh gọi DAO nếu giá trị là chuỗi trống
+                if (!string.IsNullOrEmpty(tenHT))
+                {
+                    decimal heSo = PhongDAO.GetHeSoHinhThuc(tenHT);
+                    txtHinhThucPhong_SuaDonGia.Text = heSo.ToString();
+                }
             }
         }
 
         private void LuuHinhThucPhong_Click(object sender, EventArgs e) // Nút Sửa Hình Thức
         {
-            if (string.IsNullOrEmpty(txtHinhThucPhong_SuaDonGia.Text)) return;
+            if (string.IsNullOrWhiteSpace(txtHinhThucPhong_SuaDonGia.Text))
+            {
+                MessageBox.Show("Hệ số giá của hình thức phòng không được để trống!", "Nhắc nhở", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             string tenHT = cboHinhThucPhong_SuaHinhThuc.Text;
             if (decimal.TryParse(txtHinhThucPhong_SuaDonGia.Text, out decimal heSo))
