@@ -31,13 +31,13 @@ namespace HolyBirdResort
             DataTable dtKhach = GiaoDichDAO.GetKhachHangTrongPhong(_maDoan, _maPhong);
             dgvTTKhach.AutoGenerateColumns = false;
 
-            // Kiểm tra an toàn trước khi gán để tránh lỗi NullReferenceException
+            // Gán theo Index cột để tránh lỗi đặt tên sai trong Designer (Index bắt đầu từ 0)
             if (dgvTTKhach.Columns.Count >= 4)
             {
-                dgvTTKhach.Columns[0].DataPropertyName = "Họ và tên";
-                dgvTTKhach.Columns[1].DataPropertyName = "Mã Khách Hàng"; // Theo SQL trả về
-                dgvTTKhach.Columns[2].DataPropertyName = "SDT";
-                dgvTTKhach.Columns[3].DataPropertyName = "TrangThai";
+                dgvTTKhach.Columns[0].DataPropertyName = "Họ và tên"; // Khớp với câu SELECT SQL
+                dgvTTKhach.Columns[1].DataPropertyName = "CCCD";
+                dgvTTKhach.Columns[2].DataPropertyName = "SĐT";
+                dgvTTKhach.Columns[3].DataPropertyName = "Ngày Sinh";
             }
             dgvTTKhach.DataSource = dtKhach;
 
@@ -53,10 +53,8 @@ namespace HolyBirdResort
             }
             dgvBoiThuong.DataSource = dtBoiThuong;
 
-            // 3. Nạp thông tin phòng thực tế
+            // ... Load thông tin phòng và tiền bạc như cũ ...
             LoadThongTinPhongReal();
-
-            // 4. Tính toán tiền bạc thực tế
             LoadThanhTienReal();
 
             btnXacNhan.Enabled = false;
@@ -90,22 +88,25 @@ namespace HolyBirdResort
 
         private void LoadThongTinPhongReal()
         {
-            // Bạn có thể dùng hàm GetChiTietDeHuy đã viết trước đó hoặc tạo hàm mới trong PhongDAO
-            DataRow dr = GiaoDichDAO.GetChiTietDeHuy("", _maDoan, _maPhong); // MaKH để trống vì ta lấy theo phòng
+            // Sử dụng _maDoan và _maPhong đã được truyền vào Constructor
+            DataRow dr = GiaoDichDAO.GetChiTietDeHuy("", _maDoan, _maPhong);
+
             if (dr != null)
             {
                 lblSoPhong.Text = _maPhong;
                 lblSoTang.Text = dr["MaTang"].ToString();
                 lblHangPhong.Text = dr["LoaiHang"].ToString();
                 lblHinhThuc.Text = dr["TenHinhThuc"].ToString();
-                lblNgayNhan.Text = Convert.ToDateTime(dr["ThoiGianNhanPhong"]).ToString("dd/MM/yyyy HH:mm");
-                lblNgayTra.Text = Convert.ToDateTime(dr["ThoiGianTraPhong"]).ToString("dd/MM/yyyy HH:mm");
 
-                // Tính số ngày thuê
                 DateTime ngayNhan = Convert.ToDateTime(dr["ThoiGianNhanPhong"]);
                 DateTime ngayTra = Convert.ToDateTime(dr["ThoiGianTraPhong"]);
-                int soNgay = (int)Math.Ceiling((ngayTra - ngayNhan).TotalDays);
-                lblSoNgay.Text = soNgay > 0 ? soNgay.ToString() : "1";
+
+                lblNgayNhan.Text = ngayNhan.ToString("dd/MM/yyyy HH:mm");
+                lblNgayTra.Text = ngayTra.ToString("dd/MM/yyyy HH:mm");
+
+
+                // Load giá thuê theo phòng (Nếu cần)
+                lblDonGia.Text = dr["GiaPhong"].ToString();
             }
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using HolyBirdResort.DTO;
+using HolyBirdResort.DAO;
 
 namespace HolyBirdResort
 {
@@ -40,19 +41,33 @@ namespace HolyBirdResort
             this.Close(); // đóng form
         }
 
-        private void btnThanhToan_Click(object sender, EventArgs e)
+        // Trong các Form: HoaDonTienMat, ThanhToanThe, ThanhToanVi
+        private void btnThanhToan_Click(object sender, System.EventArgs e)
         {
-            var msg = new Guna2MessageDialog
-            {
-                Parent = this,
-                Style = MessageDialogStyle.Light,
-                Caption = "Thanh toán ví điện tử",
-                Icon = MessageDialogIcon.Information,
-                Text = "Thanh toán ví/QR thành công.\nCảm ơn quý khách!"
-            };
-            msg.Show();
+            // 1. Gọi hàm cập nhật Database
+            // Giả sử bạn đã lưu _maDoan, _maPhong vào biến toàn cục của Form này khi mở nó lên
+            bool success = GiaoDichDAO.CapNhatThanhToanXong(this._maDoan, this._maPhong);
 
-            this.Close();
+            if (success)
+            {
+                var msg = new Guna2MessageDialog
+                {
+                    Parent = this,
+                    Style = MessageDialogStyle.Light,
+                    Caption = "Thanh toán thành công",
+                    Icon = MessageDialogIcon.Information,
+                    Text = "Thanh toán thành công.\nCảm ơn quý khách!"
+                };
+                msg.Show();
+
+                // 2. Trả về DialogResult.OK để Form cha biết là thanh toán xong
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Có lỗi xảy ra trong quá trình cập nhật thanh toán.");
+            }
         }
 
         private void guna2ControlBox1_Click(object sender, EventArgs e)

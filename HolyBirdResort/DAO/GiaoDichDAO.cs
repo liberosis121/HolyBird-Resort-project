@@ -99,35 +99,47 @@ namespace HolyBirdResort.DAO
         // 2. Lấy danh sách KHÁCH HÀNG trong một phòng cụ thể của đoàn
         public static DataTable GetKhachHangTrongPhong(string maDoan, string maPhong)
         {
-            // THÊM CỘT C.TrangThai VÀO ĐÂY
+            // Bổ sung đầy đủ các cột thông tin khách hàng cần thiết cho Grid
             string sql = @"
         SELECT 
-            K.MaKH as [Mã Khách Hàng], 
+            K.MaKH as [Mã Khách Hàng],
             K.TenKH as [Họ và tên],
-            C.TrangThai -- BẮT BUỘC PHẢI CÓ CỘT NÀY ĐỂ KHÔNG BỊ LỖI
+            K.SoCMND as [CCCD], 
+            K.SDT as [SĐT], 
+            K.NgaySinh as [Ngày Sinh],
+            C.TrangThai
         FROM CTGD C
-        JOIN KHACH_HANG K ON C.MaKH = K.MaKH AND C.MaDoan = K.MaDoan
+        INNER JOIN KHACH_HANG K ON C.MaKH = K.MaKH AND C.MaDoan = K.MaDoan
         WHERE C.MaDoan = @MaDoan 
           AND C.MaPhong = @MaPhong
+          -- Cho phép lấy cả khách đã xác nhận trả để thực hiện bước thanh toán
           AND C.TrangThai NOT IN (N'Đã hủy')";
 
             using (SqlConnection conn = db.GetConnection())
             {
-                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-                da.SelectCommand.Parameters.AddWithValue("@MaDoan", maDoan);
-                da.SelectCommand.Parameters.AddWithValue("@MaPhong", maPhong);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
+                try
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                    da.SelectCommand.Parameters.AddWithValue("@MaDoan", maDoan);
+                    da.SelectCommand.Parameters.AddWithValue("@MaPhong", maPhong);
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    return dt;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Lỗi lấy danh sách khách trong phòng: " + ex.Message);
+                }
             }
         }
 
         public static DataRow GetChiTietDeHuy(string maKH, string maDoan, string maPhong)
         {
-            // Truy vấn kết hợp các bảng: CTGD (Chi tiết giao dịch), KHACH_HANG (Thông tin khách), PHONG (Thông tin phòng)
-            // Lưu ý: Tên cột phải khớp chính xác với DB của bạn (SoCMND, SDT, MaTang, LoaiHang,...)
+            // Sử dụng LEFT JOIN để nếu không có MaKH thì vẫn lấy được thông tin PHONG
+            // Dùng điều kiện (MaKH = @MaKH OR @MaKH = '') để xử lý trường hợp truyền rỗng
             string sql = @"
-        SELECT 
+        SELECT TOP 1
             K.SoCMND, 
             K.NgaySinh, 
             K.SDT, 
@@ -136,15 +148,15 @@ namespace HolyBirdResort.DAO
             P.TenHinhThuc, 
             C.ThoiGianNhanPhong, 
             C.ThoiGianTraPhong, 
-            C.ThanhTien
+            C.ThanhTien,
+            P.GiaPhong
         FROM CTGD C
-        INNER JOIN KHACH_HANG K ON C.MaKH = K.MaKH AND C.MaDoan = K.MaDoan
         INNER JOIN PHONG P ON C.MaPhong = P.MaPhong
-        WHERE C.MaKH = @MaKH 
-          AND C.MaDoan = @MaDoan 
-          AND C.MaPhong = @MaPhong";
+        LEFT JOIN KHACH_HANG K ON C.MaKH = K.MaKH AND C.MaDoan = K.MaDoan
+        WHERE C.MaDoan = @MaDoan 
+          AND C.MaPhong = @MaPhong
+          AND (@MaKH = '' OR C.MaKH = @MaKH)";
 
-            // db là đối tượng kết nối bạn đã định nghĩa sẵn trong DAO
             using (SqlConnection conn = db.GetConnection())
             {
                 try
@@ -159,12 +171,11 @@ namespace HolyBirdResort.DAO
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
-                    // Nếu tìm thấy dữ liệu thì trả về dòng đầu tiên, không thì trả về null
                     return dt.Rows.Count > 0 ? dt.Rows[0] : null;
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Lỗi truy vấn chi tiết hủy: " + ex.Message);
+                    throw new Exception("Lỗi truy vấn chi tiết: " + ex.Message);
                 }
             }
         }
@@ -308,6 +319,26 @@ namespace HolyBirdResort.DAO
                     return res != DBNull.Value ? Convert.ToDecimal(res) : 0;
                 }
                 catch { return 0; }
+            }
+        }
+
+        public static bool CapNhatThanhToanXong(string maDoan, string maPhong)
+        {
+            // Chuyển toàn bộ khách trong phòng đó sang trạng thái 'Đã thanh toán'
+            string sql = @"UPDATE CTGD SET TrangThai = N'Đã thanh toán' 
+                   WHERE MaDoan = @MaDoan AND MaPhong = @MaPhong 
+                   AND TrangThai NOT IN (N'Đã hủy')";
+            using (SqlConnection conn = db.GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@MaDoan", maDoan);
+                    cmd.Parameters.AddWithValue("@MaPhong", maPhong);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+                catch { return false; }
             }
         }
     }
