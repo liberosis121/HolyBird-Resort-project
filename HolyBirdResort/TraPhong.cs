@@ -201,31 +201,36 @@ namespace HolyBirdResort
                 };
 
 
+                bool thanhToanXong = false;
                 // Điều hướng theo phương thức
                 if (pt == "Tiền mặt tại quầy")
                 {
                     using (var f = new HoaDonTienMat(info))
                     {
-                        f.ShowDialog();
+                        if (f.ShowDialog() == DialogResult.OK) thanhToanXong = true;
                     }
                 }
-                else if (pt.StartsWith("Thẻ"))  // "Thẻ tín dụng / ghi nợ"
+                else if (pt.StartsWith("Thẻ"))
                 {
                     using (var f = new ThanhToanThe(info))
                     {
-                        f.ShowDialog();
+                        if (f.ShowDialog() == DialogResult.OK) thanhToanXong = true;
                     }
                 }
-                else // còn lại là "Ví điện tử / QR"
+                else // Ví điện tử
                 {
                     using (var f = new ThanhToanVi(info))
                     {
-                        f.ShowDialog();
+                        if (f.ShowDialog() == DialogResult.OK) thanhToanXong = true;
                     }
                 }
 
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                if (thanhToanXong)
+                {
+                    this.DialogResult = DialogResult.OK; // Trả về tiếp cho ucRoomBooking
+                    this.Close();
+                }
+
             }
         }
 

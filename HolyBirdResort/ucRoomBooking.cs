@@ -262,14 +262,19 @@ namespace HolyBirdResort
             }
             else if (btnCheckOut.Text == "THANH TOÁN")
             {
-                // Mở form TraPhong và truyền dữ liệu thật
+                // Mở Form TraPhong
                 using (var dlg = new TraPhong(_currentMaDoan, _currentMaPhong))
                 {
+                    // Nếu người dùng nhấn xác nhận thanh toán ở Form con cuối cùng và trả về OK
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        // Sau khi thanh toán xong, UserControl này sẽ biến mất vì Grid khách sẽ trống
-                        LoadRealGuestList();
-                        if (dgvMembers.Rows.Count == 0) this.Parent?.Controls.Remove(this);
+                        // THỰC HIỆN LOGIC GIAO DIỆN TẠI ĐÂY (Không cần DB)
+                        btnCheckOut.Text = "ĐÃ THANH TOÁN";
+                        btnCheckOut.Enabled = false; // Disable nút theo yêu cầu
+                        btnCheckOut.FillColor = Color.Gray; // Đổi màu sang xám để nhìn rõ là đã xong
+
+                        // Vô hiệu hóa luôn cả Grid khách hàng nếu cần
+                        dgvMembers.Enabled = false;
                     }
                 }
             }

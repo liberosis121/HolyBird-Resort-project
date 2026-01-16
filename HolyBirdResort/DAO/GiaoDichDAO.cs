@@ -321,25 +321,5 @@ namespace HolyBirdResort.DAO
                 catch { return 0; }
             }
         }
-
-        public static bool CapNhatThanhToanXong(string maDoan, string maPhong)
-        {
-            // Chuyển toàn bộ khách trong phòng đó sang trạng thái 'Đã thanh toán'
-            string sql = @"UPDATE CTGD SET TrangThai = N'Đã thanh toán' 
-                   WHERE MaDoan = @MaDoan AND MaPhong = @MaPhong 
-                   AND TrangThai NOT IN (N'Đã hủy')";
-            using (SqlConnection conn = db.GetConnection())
-            {
-                try
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@MaDoan", maDoan);
-                    cmd.Parameters.AddWithValue("@MaPhong", maPhong);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
-                catch { return false; }
-            }
-        }
     }
 }

@@ -1,12 +1,24 @@
 ﻿using Guna.UI2.WinForms;
-using System.Windows.Forms;
+using HolyBirdResort.DAO;
 using HolyBirdResort.DTO;
+using System.Windows.Forms;
 
 namespace HolyBirdResort
 {
     public partial class ThanhToanThe : Form
     {
         private ThongTinHoaDonTienMat _info;
+
+
+        private string _maDoan;
+        private string _maPhong;
+
+        public ThanhToanThe(ThongTinHoaDonTienMat info, string maDoan, string maPhong) : this()
+        {
+            _info = info;
+            _maDoan = maDoan; // Gán giá trị được truyền sang
+            _maPhong = maPhong;
+        }
 
         // Constructor mặc định (Designer cần cái này)
         public ThanhToanThe()
@@ -55,18 +67,17 @@ namespace HolyBirdResort
                 return;
             }
 
-            // === THANH TOÁN THÀNH CÔNG (demo) ===
             var msg = new Guna2MessageDialog
             {
                 Parent = this,
                 Style = MessageDialogStyle.Light,
-                Caption = "Thanh toán thẻ",
+                Caption = "Thanh toán thành công",
                 Icon = MessageDialogIcon.Information,
-                Text = "Thanh toán bằng thẻ thành công.\nCảm ơn quý khách!",
-                Buttons = MessageDialogButtons.OK
+                Text = "Thanh toán thành công.\nCảm ơn quý khách!"
             };
             msg.Show();
 
+            // 2. Trả về DialogResult.OK để Form cha biết là thanh toán xong
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
