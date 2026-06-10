@@ -1,74 +1,112 @@
 # HolyBird Resort Management System
-HolyBird Resort Management System là một hệ thống quản lý việc đặt trả phòng tại HolyBird Resort.
 
-### 🛠 Công nghệ sử dụng (Tech Stack)
+HolyBird Resort Management System is a desktop application designed to support room reservation, occupancy management, check-in/check-out operations, and compensation processing for a resort environment.
 
-Ngôn ngữ: C#.
+Developed as part of the Database Management Systems course at the University of Science, VNU-HCM, the project focuses on database design, transaction processing, and concurrency control in multi-user environments.
 
-Framework: .NET Framework 4.8 (WinForms).
+## Overview
 
-Giao diện: Guna UI2 WinForms Components (tối ưu hóa giao diện hiện đại).
+The system enables customers to search and reserve rooms while allowing resort staff to manage room information, customer accounts, reservations, compensation records, and payment processes.
 
-Cơ sở dữ liệu: Microsoft SQL Server.
+A key objective of the project is ensuring data consistency when multiple users perform concurrent operations on the system. To address this challenge, the application incorporates transaction management mechanisms and analyzes common concurrency issues such as Lost Update and Deadlock scenarios.
 
-Công nghệ kết nối: ADO.NET (SQL Connection, Command, DataAdapter, Transaction).
+## Technology Stack
 
-Quản lý mã nguồn: Git & GitHub.
+**Language**
 
-### ✨ Tính năng chính (Key Features)
+* C#
 
-#### 👤 Dành cho Khách hàng
+**Framework**
 
-Quản lý thông tin tài khoản: Xem và cập nhật thông tin cá nhân của đoàn khách.
+* .NET Framework 4.8
+* Windows Forms (WinForms)
 
-Quản lý đặt phòng: Theo dõi danh sách phòng đã đặt, thời gian nhận/trả phòng thực tế.
+**Database**
 
-Tra cứu đặt phòng: Tra cứu danh sách phòng có sẵn, đặt phòng tùy thích.
+* Microsoft SQL Server
 
-Thanh toán đa phương thức: Hỗ trợ thanh toán qua Tiền mặt, Thẻ tín dụng và Ví điện tử (QR Code).
+**Data Access**
 
-#### 👨‍💼 Dành cho Nhân viên
+* ADO.NET
 
-Quản lý phòng: Thêm, sửa thông tin phòng, hạng phòng và hình thức phòng.
+**UI Library**
 
-Kiểm soát bồi thường: Ghi nhận hư hại tài sản cho từng chi tiết giao dịch (CTGD) trong phòng.
+* Guna UI2 WinForms
 
-Xác nhận trả phòng: Kiểm tra và xác nhận trạng thái trả phòng cho từng phòng trước khi khách thanh toán.
+**Version Control**
 
-Đăng ký đoàn và tạo tài khoản giúp khách hàng.
+* Git
+* GitHub
 
-### 🔄 Luồng Logic Hệ thống (System Workflow)
+## Core Functionalities
 
-Hệ thống vận hành dựa trên chuỗi trạng thái nghiêm ngặt để đảm bảo tính nhất quán dữ liệu:
+### Customer
 
-Giai đoạn đặt phòng: Khách hàng đặt phòng, trạng thái khởi tạo là Chưa nhận phòng nếu chưa đến thời gian.
+* Manage account information
+* Search available rooms
+* Create and monitor reservations
+* View booking history
+* Request check-out
+* Complete payments using multiple payment methods
 
-Giai đoạn lưu trú: * Đúng giờ nhận: Nút Nhận phòng hiển thị xanh.
+### Staff
 
-Sau khi nhấn: Trạng thái chuyển sang Chưa trả phòng.
+* Manage rooms and room categories
+* Register customer groups and accounts
+* Process check-in and check-out requests
+* Record compensation and damage reports
+* Generate invoices
+* Monitor room occupancy status
 
-Giai đoạn hoàn tất:
+## Database & Transaction Management
 
-Khách nhấn Trả phòng: Trạng thái chuyển sang Yêu cầu trả phòng.
+The project was designed around a relational database architecture consisting of customer, reservation, room, transaction, compensation, and account management modules.
 
-Nhân viên kiểm kê & bồi thường: Trạng thái chuyển sang Đã trả phòng.
+Key database concepts applied include:
 
-Thanh toán: Khách xem hóa đơn tổng hợp (Tiền phòng + Tiền bồi thường) và hoàn tất giao dịch.
+* Relational database modeling
+* Primary and foreign key constraints
+* Stored procedures
+* Triggers
+* Transaction management
+* Concurrency control
+* Deadlock analysis and prevention
 
-### 🚀 Hướng dẫn cài đặt và khởi chạy
+## Team
 
-#### 1. Cấu hình Database
+| Student ID | Full Name            |
+| ---------- | -------------------- |
+| 23120189   | Hoàng Quốc Việt      |
+| 23120193   | Trần Kim Yến         |
+| 23120201   | Nguyễn Thị Trúc Hằng |
+| 23120209   | Lê Hoàng Nhật Anh    |
+| 23120237   | Lê Lâm Trí Đức       |
 
-Mở SQL Server Management Studio (SSMS).
+## My Contributions
 
-Tạo database mới tên là DB_HolyBird.
+**Trần Kim Yến**
 
-Chạy script SQL đính kèm trong thư mục Database/DB_HolyBird.sql để tạo bảng, triggers và stored procedures.
+* Analyzed transaction conflict scenarios and concurrency issues, demonstrated common problems such as Lost Update and Deadlock, and proposed resolution strategies to ensure data consistency.
+* Designed and implemented the relational database schema, including table structures, relationships, constraints, stored procedures, and triggers.
+* Developed and maintained the application following a 3-layer architecture (Presentation Layer, Business Logic Layer, Data Access Layer).
+* Implemented database connectivity and data processing using ADO.NET with SQL Server.
+* Designed user interfaces for customer and staff modules, and participated in system analysis, testing, and validation of core functionalities.
 
-#### 2. Cấu hình Ứng dụng
+## Setup
 
-Mở file solution HolyBirdResort.sln bằng Visual Studio 2022.
+### Database
 
-Mở file DAO/DBConnection.cs (hoặc App.config) và cập nhật chuỗi kết nối (Connection String) phù hợp với SQL Server của bạn.
+1. Create a SQL Server database named `DB_HolyBird`.
+2. Execute the provided SQL script to create tables, constraints, triggers, and stored procedures.
 
-Build solution (Ctrl + Shift + B).
+### Application
+
+1. Open `HolyBirdResort.sln` using Visual Studio 2022.
+2. Configure the SQL Server connection string.
+3. Build and run the application.
+
+## Academic Information
+
+**Course:** Database Management Systems
+**Institution:** University of Science, VNU-HCM
+**Project Type:** Team Project
