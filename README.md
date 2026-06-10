@@ -108,5 +108,7 @@ Key database concepts applied include:
 ## Academic Information
 
 **Course:** Database Management Systems
+
 **Institution:** University of Science, VNU-HCM
+
 **Project Type:** Team Project
